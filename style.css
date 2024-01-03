@@ -1,0 +1,110 @@
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1em;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(45deg, #e7e7e7, #f2f2f2);
+}
+
+caption {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+thead {
+    background-color: #f2f2f2;
+}
+
+th {
+    text-align: left;
+    padding: 0.5em;
+    border: 1px solid #ddd;
+    background: linear-gradient(45deg, #555, #888);
+    color: #fff;
+}
+
+td {
+    padding: 0.5em;
+    border: 1px solid #ddd;
+}
+
+input[type="date"],
+input[type="number"],
+input[type="text"] {
+    width: 100%;
+    padding: 0.5em;
+    border: none;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Vendor-prefixed appearance property */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Standard appearance property */
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+span#totalIncome,
+span#totalExpense,
+span#profit {
+    font-weight: bold;
+}
+
+button {
+    background-color: #e7e7e7;
+    border: none;
+    color: #333;
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: #555;
+    color: #fff;
+}
+
+/* INPUT FIELD SIZES */
+
+/* Date input field */
+.custom-date input[type="date"] {
+    width: 100px; /* Change this value to desired size */
+}
+/* Transaction input field */
+.custom-transaction input[type="text"] {
+    width: 850px; /* Change this value to desired size */
+}
+/* Income and Expense input fields */
+.custom-income input[type="number"],
+.custom-expense input[type="number"] {
+    width: 50px; /* Change this value to desired size */
+}
+
+/* COLUMN SIZES FOR INPUT FIELDS */
+
+/* Width of ID column */
+th:first-child {
+    width: 50px; /* Change this value to desired size */
+}
+
+/* Width of Date column */
+th:nth-child(2) {
+    width: 100px; /* Width of "Date" input field column */
+}
+/* Width of Transaction Name column */
+th:nth-child(3) {
+    width: 850px; /* Width of "Transaction" input field column */
+}
+/* Width of Income and Expense columns */
+th:nth-child(4),
+th:nth-child(5) {
+    width: 50px; /* Width of "Income €" and "Expense €" input field columns */
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Income/Expense table</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="calculate.js"></script>
+    <script src="add.js"></script>
+    <script src="confirmRow.js"></script>
+    <script src="editRow.js"></script>
+    <style>
+        /* Style adjustments */
+        .sidebar {
+            float: right;
+            width: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>Additional Information</h2>
+        <p>Total Income €: <span id="totalIncome"></span></p>
+        <p>Total Expenses €: <span id="totalExpense"></span></p>
+        <p>Profit €: <span id="profit"></span></p>
+    </div>
+
+    <table>
+        <caption>Table of income and expense transactions with calculation</caption>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Transaction</th>
+                <th>Income €</th>
+                <th>Expense €</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-id="1">
+                <td>1</td>
+                <td class="custom-date"><input type="date" name="date"></td>
+                <td class="custom-transaction"><input type="text" name="transaction"></td>
+                <td class="custom-income"><input type="number" name="income" onchange="calculateTotal()"></td>
+                <td class="custom-expense"><input type="number" name="expense" onchange="calculateTotal()"></td>
+                <td>
+                    <button onclick="confirmRow(this)">Confirm</button>
+                    <button onclick="editRow(this)">Edit</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <input type="hidden" id="idCounter" value="1">
+    <button onclick="addRow()">Add New Entry</button>
+    <button onclick="saveData()">Save</button>
+</body>
+
+</html>
