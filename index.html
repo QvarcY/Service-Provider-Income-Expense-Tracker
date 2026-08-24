@@ -1,62 +1,330 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="lv" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <title>Income/Expense table</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="calculate.js"></script>
-    <script src="add.js"></script>
-    <script src="confirmRow.js"></script>
-    <script src="editRow.js"></script>
-    <style>
-        /* Style adjustments */
-        .sidebar {
-            float: right;
-            width: 200px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            margin-left: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Privacy-friendly income and expense tracker for freelancers and service providers.">
+  <title>Service Provider Finance Tracker</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div class="sidebar">
-        <h2>Additional Information</h2>
-        <p>Total Income €: <span id="totalIncome"></span></p>
-        <p>Total Expenses €: <span id="totalExpense"></span></p>
-        <p>Profit €: <span id="profit"></span></p>
-    </div>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">SP</span>
+        <div>
+          <span class="eyebrow">Service Provider</span>
+          <h1 data-i18n="app.title">Finance Tracker</h1>
+        </div>
+      </div>
 
-    <table>
-        <caption>Table of income and expense transactions with calculation</caption>
-        <thead>
+      <div class="top-actions">
+        <div class="segmented-control" aria-label="Language">
+          <button type="button" class="segment language-option active" data-lang="lv">LV</button>
+          <button type="button" class="segment language-option" data-lang="en">EN</button>
+        </div>
+
+        <button id="themeToggle" class="secondary-button compact" type="button">
+          <span id="themeToggleText">Tumšā tēma</span>
+        </button>
+
+        <button id="openSettings" class="secondary-button compact" type="button" data-i18n="actions.settings">
+          Iestatījumi
+        </button>
+
+        <button id="openTransaction" class="primary-button compact" type="button">
+          <span>＋</span>
+          <span data-i18n="actions.addTransaction">Jauns darījums</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <span class="eyebrow" data-i18n="hero.eyebrow">Mazā biznesa finanšu pārskats</span>
+        <h2 data-i18n="hero.title">Redzi, ko nopelni — un kur nauda pazūd.</h2>
+        <p data-i18n="hero.subtitle">
+          Vienkārša ienākumu un izdevumu uzskaite pašnodarbinātajiem, frīlanceriem un pakalpojumu sniedzējiem.
+          Dati paliek tikai tavā pārlūkā.
+        </p>
+      </div>
+
+      <div class="period-control">
+        <label for="periodSelect" data-i18n="filters.period">Periods</label>
+        <select id="periodSelect">
+          <option value="month" data-i18n="period.month">Šis mēnesis</option>
+          <option value="year" data-i18n="period.year">Šis gads</option>
+          <option value="all" data-i18n="period.all">Viss periods</option>
+          <option value="custom" data-i18n="period.custom">Pielāgots</option>
+        </select>
+      </div>
+    </section>
+
+    <section id="customPeriod" class="custom-period hidden">
+      <label class="field">
+        <span data-i18n="filters.from">No</span>
+        <input id="dateFrom" type="date">
+      </label>
+
+      <label class="field">
+        <span data-i18n="filters.to">Līdz</span>
+        <input id="dateTo" type="date">
+      </label>
+    </section>
+
+    <section class="summary-grid">
+      <article class="summary-card income-card">
+        <div class="summary-icon">↗</div>
+        <div>
+          <span data-i18n="summary.income">Ienākumi</span>
+          <strong id="summaryIncome">0.00 €</strong>
+        </div>
+      </article>
+
+      <article class="summary-card expense-card">
+        <div class="summary-icon">↘</div>
+        <div>
+          <span data-i18n="summary.expenses">Izdevumi</span>
+          <strong id="summaryExpenses">0.00 €</strong>
+        </div>
+      </article>
+
+      <article class="summary-card profit-card">
+        <div class="summary-icon">=</div>
+        <div>
+          <span data-i18n="summary.profit">Peļņa</span>
+          <strong id="summaryProfit">0.00 €</strong>
+        </div>
+      </article>
+
+      <article class="summary-card margin-card">
+        <div class="summary-icon">%</div>
+        <div>
+          <span data-i18n="summary.margin">Peļņas marža</span>
+          <strong id="summaryMargin">0.0%</strong>
+        </div>
+      </article>
+    </section>
+
+    <section class="analytics-grid">
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow" data-i18n="analytics.cashflow">Naudas plūsma</span>
+            <h3 data-i18n="analytics.monthly">Pēdējie 6 mēneši</h3>
+          </div>
+
+          <div class="chart-legend">
+            <span><i class="legend-dot income-dot"></i><span data-i18n="summary.income">Ienākumi</span></span>
+            <span><i class="legend-dot expense-dot"></i><span data-i18n="summary.expenses">Izdevumi</span></span>
+          </div>
+        </div>
+
+        <div id="monthlyChart" class="monthly-chart"></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow" data-i18n="analytics.expenses">Izdevumu sadalījums</span>
+            <h3 data-i18n="analytics.categories">Pēc kategorijām</h3>
+          </div>
+        </div>
+
+        <div id="expenseCategories" class="category-chart"></div>
+      </article>
+    </section>
+
+    <section class="panel transactions-panel">
+      <div class="panel-heading transaction-heading">
+        <div>
+          <span class="eyebrow" data-i18n="transactions.eyebrow">Darījumu žurnāls</span>
+          <h3 data-i18n="transactions.title">Ienākumi un izdevumi</h3>
+        </div>
+
+        <div class="transaction-tools">
+          <div class="search-box">
+            <span>⌕</span>
+            <input id="searchInput" type="search" placeholder="Meklēt..." data-i18n-placeholder="filters.search">
+          </div>
+
+          <select id="typeFilter">
+            <option value="all" data-i18n="filters.allTypes">Visi tipi</option>
+            <option value="income" data-i18n="types.income">Ienākumi</option>
+            <option value="expense" data-i18n="types.expense">Izdevumi</option>
+          </select>
+
+          <select id="categoryFilter">
+            <option value="all" data-i18n="filters.allCategories">Visas kategorijas</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
             <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Transaction</th>
-                <th>Income €</th>
-                <th>Expense €</th>
+              <th data-i18n="table.date">Datums</th>
+              <th data-i18n="table.description">Apraksts</th>
+              <th data-i18n="table.category">Kategorija</th>
+              <th data-i18n="table.type">Tips</th>
+              <th class="align-right" data-i18n="table.amount">Summa</th>
+              <th class="actions-column" data-i18n="table.actions">Darbības</th>
             </tr>
-        </thead>
-        <tbody>
-            <tr data-id="1">
-                <td>1</td>
-                <td class="custom-date"><input type="date" name="date"></td>
-                <td class="custom-transaction"><input type="text" name="transaction"></td>
-                <td class="custom-income"><input type="number" name="income" onchange="calculateTotal()"></td>
-                <td class="custom-expense"><input type="number" name="expense" onchange="calculateTotal()"></td>
-                <td>
-                    <button onclick="confirmRow(this)">Confirm</button>
-                    <button onclick="editRow(this)">Edit</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <input type="hidden" id="idCounter" value="1">
-    <button onclick="addRow()">Add New Entry</button>
-    <button onclick="saveData()">Save</button>
-</body>
+          </thead>
+          <tbody id="transactionBody"></tbody>
+        </table>
 
+        <div id="emptyState" class="empty-state hidden">
+          <div class="empty-icon">◎</div>
+          <h4 data-i18n="empty.title">Nav atrasts neviens darījums</h4>
+          <p data-i18n="empty.subtitle">Pievieno pirmo darījumu vai maini filtrus.</p>
+        </div>
+      </div>
+
+      <div class="table-footer">
+        <span id="transactionCount">0 darījumi</span>
+
+        <div class="footer-actions">
+          <button id="importCsv" class="secondary-button" type="button" data-i18n="actions.importCsv">Importēt CSV</button>
+          <button id="exportCsv" class="secondary-button" type="button" data-i18n="actions.exportCsv">Eksportēt CSV</button>
+          <input id="csvFileInput" type="file" accept=".csv,text/csv" hidden>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="transactionBackdrop" class="modal-backdrop hidden" aria-hidden="true">
+    <section class="modal transaction-modal" role="dialog" aria-modal="true" aria-labelledby="transactionModalTitle">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow" data-i18n="transaction.modalEyebrow">Darījums</span>
+          <h2 id="transactionModalTitle" data-i18n="transaction.newTitle">Jauns darījums</h2>
+        </div>
+        <button class="icon-button close-transaction" type="button" aria-label="Close">×</button>
+      </div>
+
+      <form id="transactionForm" class="modal-body">
+        <input id="transactionId" type="hidden">
+
+        <div class="type-switch">
+          <label>
+            <input type="radio" name="transactionType" value="income" checked>
+            <span class="income-choice" data-i18n="types.income">Ienākumi</span>
+          </label>
+
+          <label>
+            <input type="radio" name="transactionType" value="expense">
+            <span class="expense-choice" data-i18n="types.expense">Izdevumi</span>
+          </label>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span data-i18n="transaction.date">Datums</span>
+            <input id="transactionDate" type="date" required>
+          </label>
+
+          <label class="field">
+            <span data-i18n="transaction.amount">Summa</span>
+            <div class="input-with-unit">
+              <input id="transactionAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+              <span id="currencyUnit">€</span>
+            </div>
+          </label>
+
+          <label class="field field-full">
+            <span data-i18n="transaction.description">Apraksts</span>
+            <input id="transactionDescription" type="text" maxlength="120" placeholder="Piem., zāles pļaušana" data-i18n-placeholder="transaction.descriptionPlaceholder" required>
+          </label>
+
+          <label class="field">
+            <span data-i18n="transaction.category">Kategorija</span>
+            <select id="transactionCategory" required></select>
+          </label>
+
+          <label class="field field-full">
+            <span data-i18n="transaction.notes">Piezīmes</span>
+            <textarea id="transactionNotes" rows="3" maxlength="400" placeholder="Papildu informācija..." data-i18n-placeholder="transaction.notesPlaceholder"></textarea>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-button close-transaction" data-i18n="actions.cancel">Atcelt</button>
+          <button type="submit" class="primary-button" data-i18n="actions.saveTransaction">Saglabāt darījumu</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div id="settingsBackdrop" class="modal-backdrop hidden" aria-hidden="true">
+    <section class="modal settings-modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow" data-i18n="settings.eyebrow">Lietotnes iestatījumi</span>
+          <h2 id="settingsTitle" data-i18n="settings.title">Iestatījumi</h2>
+        </div>
+        <button id="closeSettings" class="icon-button" type="button" aria-label="Close">×</button>
+      </div>
+
+      <form id="settingsForm" class="modal-body">
+        <div class="settings-section">
+          <h3 data-i18n="settings.general">Vispārīgi</h3>
+
+          <div class="form-grid">
+            <label class="field">
+              <span data-i18n="settings.currency">Valūtas simbols</span>
+              <input id="settingCurrency" type="text" maxlength="4" required>
+            </label>
+
+            <label class="field">
+              <span data-i18n="settings.businessName">Uzņēmuma / darba nosaukums</span>
+              <input id="settingBusinessName" type="text" maxlength="80" placeholder="Mans bizness">
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3 data-i18n="settings.categories">Kategorijas</h3>
+          <p class="settings-help" data-i18n="settings.categoriesHelp">
+            Viena kategorija katrā rindā. Izmaiņas neizdzēsīs kategoriju nosaukumus no jau saglabātiem darījumiem.
+          </p>
+
+          <div class="form-grid">
+            <label class="field">
+              <span data-i18n="settings.incomeCategories">Ienākumu kategorijas</span>
+              <textarea id="settingIncomeCategories" rows="7"></textarea>
+            </label>
+
+            <label class="field">
+              <span data-i18n="settings.expenseCategories">Izdevumu kategorijas</span>
+              <textarea id="settingExpenseCategories" rows="7"></textarea>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section danger-zone">
+          <h3 data-i18n="settings.data">Dati</h3>
+          <p class="settings-help" data-i18n="settings.dataHelp">
+            Eksportē datus pirms pārlūka datu dzēšanas vai pārcelšanās uz citu ierīci.
+          </p>
+
+          <button id="deleteAllData" type="button" class="danger-button" data-i18n="actions.deleteAllData">
+            Dzēst visus darījumus
+          </button>
+        </div>
+
+        <div class="modal-actions">
+          <button id="resetSettings" type="button" class="secondary-button" data-i18n="actions.resetDefaults">Atjaunot noklusējumu</button>
+          <button type="submit" class="primary-button" data-i18n="actions.saveSettings">Saglabāt iestatījumus</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="script.js"></script>
+</body>
 </html>
